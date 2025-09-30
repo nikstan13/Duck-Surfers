@@ -1,0 +1,9 @@
+.DS_Store
+.vscode/
+calibration-tool.html
+debug-rails.html
+exact-calibration.html
+live-calibration.html
+simple-calibration.html
+test-calibration.html
+CALIBRATION_GUIDE.md

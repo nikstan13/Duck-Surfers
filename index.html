@@ -1,0 +1,108 @@
+  <!DOCTYPE html>
+<html lang="el">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
+    <title>Duck Surfers</title>
+    <link rel="preconnect" href="self" />
+    <link rel="preload" href="Assets/ducky.png" as="image" />
+    <link rel="preload" href="Assets/noufaro.png" as="image" />
+    <link rel="preload" href="Assets/shield.png" as="image" />
+    <link rel="preload" href="Assets/doro.png" as="image" />
+    <link rel="preload" href="Assets/river.mp4" as="video" type="video/mp4" />
+    <link rel="preload" href="Assets/mobileriver.mov" as="video" type="video/quicktime" />
+    <link rel="preload" href="game.js" as="script" />
+        <link rel="stylesheet" href="styles.css?v=1759247265" />
+  </head>
+  <body>
+    <div id="game-root">
+            <div id="hud">
+        <div class="hud-bar">
+          <span class="hud-item">
+            <span class="hud-label">Score:</span>
+            <span id="score" class="hud-value">0</span>
+          </span>
+          <span class="hud-item">
+            <span class="hud-label">Speed:</span>
+            <span id="speed" class="hud-value">1.0x</span>
+          </span>
+          <span class="hud-item">
+            <span class="hud-label">Bonus:</span>
+            <span id="bonus" class="hud-value">0%</span>
+          </span>
+          <span class="hud-item">
+            <span id="shield-indicator" class="shield-indicator hidden">🛡️</span>
+          </span>
+          <span class="hud-item">
+            <input type="checkbox" id="checkboxInput" checked>
+            <label for="checkboxInput" class="toggleSwitch">
+              <div class="speaker"><svg xmlns="http://www.w3.org/2000/svg" version="1.0" viewBox="0 0 75 75">
+                <path d="M39.389,13.769 L22.235,28.606 L6,28.606 L6,47.699 L21.989,47.699 L39.389,62.75 L39.389,13.769z" style="stroke:#fff;stroke-width:5;stroke-linejoin:round;fill:#fff;"></path>
+                <path d="M48,27.6a19.5,19.5 0 0 1 0,21.4M55.1,20.5a30,30 0 0 1 0,35.6M61.6,14a38.8,38.8 0 0 1 0,48.6" style="fill:none;stroke:#fff;stroke-width:5;stroke-linecap:round"></path>
+              </svg></div>
+              <div class="mute-speaker"><svg version="1.0" viewBox="0 0 75 75" stroke="#fff" stroke-width="5">
+                <path d="m39,14-17,15H6V48H22l17,15z" fill="#fff" stroke-linejoin="round"></path>
+                <path d="m49,26 20,24m0-24-20,24" fill="#fff" stroke-linecap="round"></path>
+              </svg></div>
+            </label>
+          </span>
+        </div>
+      </div>      <div id="cal-readout" class="cal hidden">Calibration: left=0px spacing=0px tilt=0px anchor=bottom</div>
+
+      <canvas id="game" width="480" height="800" aria-label="Duck Surfers"></canvas>
+
+      <div id="tap-to-start" class="overlay">
+        <div class="card">
+          <div class="loader">
+            <span>Duck Surfers</span>
+          </div>
+          <p>Απέφυγε τα νούφαρα και μάζεψε προσφορές!</p>
+          <ul class="controls">
+            <li>← → ή A/D για μετακίνηση</li>
+            <li>Swipe αριστερά/δεξιά στο κινητό</li>
+            <li>P για παύση</li>
+          </ul>
+          <div id="video-loading" class="loading-indicator hidden">
+            <div class="spinner"></div>
+            <span>Φόρτωση βίντεο...</span>
+          </div>
+          <button id="start-btn">Ξεκίνα</button>
+        </div>
+      </div>
+
+      <div id="paused" class="overlay hidden">
+        <div class="card">
+          <h2>Παύση</h2>
+          <button id="resume-btn">Συνέχισε</button>
+        </div>
+      </div>
+
+      <div id="game-over" class="overlay hidden">
+        <div class="card">
+          <h2>Game Over</h2>
+          <p id="gover-msg">Προσπάθησε ξανά!</p>
+          <p><strong>Τελικό Σκορ:</strong> <span id="final-score">0</span></p>
+          <div id="offer-section" class="hidden">
+            <p id="offer-desc">Κέρδισες προσφορά για το Drop 🎁</p>
+            <div class="code-row">
+              <code id="offer-code">DUCKDROP-XXXXXX</code>
+              <button id="copy-code">Αντιγραφή</button>
+            </div>
+          </div>
+          <div class="actions">
+            <button id="restart-btn" class="primary">Ξαναπαίξε</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <audio id="background-music" loop preload="auto">
+      <source src="Assets/music.mp3" type="audio/mpeg">
+    </audio>
+
+    <script src="game.js?v=1759247265"></script>
+  </body>
+  </html>
