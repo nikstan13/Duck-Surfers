@@ -86,6 +86,11 @@
   const videoLoadingEl = document.getElementById('video-loading');
   const musicToggleCheckbox = document.getElementById('checkboxInput');
   const backgroundMusic = document.getElementById('background-music');
+  const gameoverSound = document.getElementById('gameover-sound');
+
+  const noufaroSound = document.getElementById('noufaro-sound');
+  const shieldSound = document.getElementById('shield-sound');
+  const shieldBreakSound = document.getElementById('shieldbreak-sound');
 
   // Device pixel ratio with mobile compensation
   let dpr = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
@@ -380,6 +385,8 @@
     lastSpawn: 0,
     rng: mulberry32(Date.now() & 0xffffffff),
     touchStart: null,
+    touchSwipeExecuted: false,
+    lastSwipeTime: 0,
     gameOver: false,
     offerCode: null,
     offersCollected: 0,
@@ -479,34 +486,60 @@
     if (e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') moveRight();
   });
 
-  // Touch swipe controls (Enhanced for mobile)
+  // Touch swipe controls (Instant response - no wait for touchend)
+  const SWIPE_THRESHOLD = 30;        // Minimum distance for swipe
+  const INTENT_DISTANCE = 15;        // Minimum distance to start tracking
+  const SWIPE_COOLDOWN = 150;        // Milliseconds between swipes
+  const VERTICAL_TOLERANCE = 1.2;    // Horizontal must be 1.2x larger than vertical
+
   canvas.addEventListener('touchstart', (e) => {
     e.preventDefault(); // Prevent scrolling while playing
-    // Removed auto-start on touch - now only START button works
     if (e.touches && e.touches[0]) {
       state.touchStart = { x: e.touches[0].clientX, y: e.touches[0].clientY, t: performance.now() };
+      state.touchSwipeExecuted = false; // Reset swipe flag
     }
   }, { passive: false });
   
   canvas.addEventListener('touchmove', (e) => {
     e.preventDefault(); // Prevent scrolling while playing
+    if (!state.touchStart || state.touchSwipeExecuted) return;
+    
+    const touch = e.touches && e.touches[0];
+    if (!touch) return;
+    
+    const dx = touch.clientX - state.touchStart.x;
+    const dy = touch.clientY - state.touchStart.y;
+    const adx = Math.abs(dx);
+    const ady = Math.abs(dy);
+    const now = performance.now();
+    
+    // Check if we've moved enough to consider it intentional
+    if (adx < INTENT_DISTANCE && ady < INTENT_DISTANCE) return;
+    
+    // Check cooldown to prevent too frequent swipes
+    if (now - state.lastSwipeTime < SWIPE_COOLDOWN) return;
+    
+    // Must be primarily horizontal movement
+    if (adx < SWIPE_THRESHOLD) return;
+    if (adx < ady * VERTICAL_TOLERANCE) return; // Too much vertical movement
+    
+    // Execute the swipe immediately!
+    if (dx < 0) {
+      moveLeft();
+    } else {
+      moveRight();
+    }
+    
+    // Mark this gesture as completed and set cooldown
+    state.touchSwipeExecuted = true;
+    state.lastSwipeTime = now;
   }, { passive: false });
   
   canvas.addEventListener('touchend', (e) => {
     e.preventDefault(); // Prevent scrolling while playing
-    if (!state.touchStart) return;
-    const touch = e.changedTouches && e.changedTouches[0];
-    if (!touch) return;
-    const dx = touch.clientX - state.touchStart.x;
-    const dy = touch.clientY - state.touchStart.y;
-    const adx = Math.abs(dx), ady = Math.abs(dy);
-    const dt = performance.now() - state.touchStart.t;
-    
-    // More responsive swipe detection
-    if (adx > 15 && adx > ady && dt < 500) { // Reduced threshold and time limit
-      if (dx < 0) moveLeft(); else moveRight();
-    }
+    // Just reset the touch state - swipe was already handled in touchmove
     state.touchStart = null;
+    state.touchSwipeExecuted = false;
   }, { passive: false });
 
   // Buttons
@@ -572,6 +605,19 @@
     state.gameOver = true;
     state.started = false; // stop loop
     if (overlayPaused) overlayPaused.classList.add('hidden');
+    
+    // Stop background music when game ends
+    if (backgroundMusic && !backgroundMusic.paused) {
+      backgroundMusic.pause();
+    }
+    
+    // Play game over sound
+    if (gameoverSound) {
+      gameoverSound.currentTime = 0; // Reset to start
+      gameoverSound.volume = 0.5; // Set volume to 50%
+      gameoverSound.play().catch(e => console.log('Game over sound blocked:', e));
+    }
+    
     // Update Game Over UI
     if (finalScoreEl) finalScoreEl.textContent = String(Math.floor(state.score));
     const percent = Math.min(CONFIG.maxPercent, Math.max(0, state.offersCollected));
@@ -605,6 +651,8 @@
     state.lastSpawn = 0;
     state.rng = mulberry32(Date.now() & 0xffffffff);
     state.touchStart = null;
+    state.touchSwipeExecuted = false;
+    state.lastSwipeTime = 0;
     
     // Hide HUD when game restarts
     const hud = document.getElementById('hud');
@@ -841,11 +889,102 @@
           if (state.offersCollected < CONFIG.maxPercent) {
             state.offersCollected = Math.min(CONFIG.maxPercent, state.offersCollected + 1);
           }
+          // Play noufaro bonus sound ONLY for bonus pickup
+          if (noufaroSound) {
+            noufaroSound.currentTime = 0;
+            noufaroSound.volume = 0.7;
+            noufaroSound.play();
+          }
           updateHUD();
           spawnSparkles(state.player.x, state.player.y - state.player.r * dpr, 14);
+        } else if (o.type === 'lily') {
+          // Last-moment frontal graze forgiveness: if the lily's top is already
+          // past the duck's front boundary (within a small margin), ignore.
+          const playerTop = state.player.y - state.player.r * dpr;
+          const lilyTop = o.y - o.r;
+          if (lilyTop >= playerTop - CONFIG.lateFrontForgivenessPx * dpr) {
+            state.objects.splice(i,1);
+            shake(3, 160);
+            spawnSplash(o.x, o.y - o.r, 8);
+            continue;
+          }
+
+          // Determine frontal vs side hit
+          const frontalThreshold = state.player.r * dpr * CONFIG.frontalDxFactor;
+          const isFrontal = Math.abs(dx) <= frontalThreshold;
+          if (isFrontal) {
+            // Check if player has shield
+            if (state.player.hasShield) {
+              // Shield protects from frontal hit
+              state.player.hasShield = false; // Shield is consumed
+                  // Play shield break sound
+                  if (shieldBreakSound) {
+                    shieldBreakSound.currentTime = 0;
+                    shieldBreakSound.volume = 0.6;
+                    shieldBreakSound.play();
+                  }
+              // Play shield break sound
+              if (shieldBreakSound) {
+                shieldBreakSound.currentTime = 0;
+                shieldBreakSound.volume = 0.6;
+                shieldBreakSound.play();
+              }
+              state.objects.splice(i,1);
+              shake(2, 120);
+              spawnSparkles(state.player.x, state.player.y - state.player.r * dpr, 25); // Shield break effect
+              updateHUD();
+              continue;
+            } else {
+              gameOver();
+              break;
+            }
+          } else {
+            // Side hit: wobble grace. Avoid double-counting on same lily.
+            if (state.sideHitCooldown <= 0) {
+              const nowMs = performance.now();
+              if (nowMs < state.wobbleUntil) {
+                // second side hit within grace
+                // Check if player has shield for side hit protection
+                if (state.player.hasShield) {
+                  // Shield protects from second side hit (game over)
+                  state.player.hasShield = false; // Shield is consumed
+                  // Play shield break sound
+                  if (shieldBreakSound) {
+                    shieldBreakSound.currentTime = 0;
+                    shieldBreakSound.volume = 0.6;
+                    shieldBreakSound.play();
+                  }
+                  state.objects.splice(i,1);
+                  shake(2, 120);
+                  spawnSparkles(state.player.x, state.player.y - state.player.r * dpr, 25); // Shield break effect
+                  updateHUD();
+                  // Reset wobble state
+                  state.wobbleUntil = 0;
+                  state.sideHitCooldown = CONFIG.sideCooldownMs;
+                  continue;
+                } else {
+                  gameOver();
+                  break;
+                }
+              } else {
+                // start wobble grace and remove the obstacle to prevent repeated collisions
+                state.wobbleUntil = nowMs + CONFIG.sideGraceMs;
+                state.sideHitCooldown = CONFIG.sideCooldownMs;
+                state.objects.splice(i,1);
+                shake(4, 280);
+                spawnSplash(o.x, o.y, 10);
+              }
+            }
+          }
         } else if (o.type === 'shield') {
           state.objects.splice(i,1);
           state.player.hasShield = true;
+          // Play shield sound when collected
+          if (shieldSound) {
+            shieldSound.currentTime = 0;
+            shieldSound.volume = 0.6;
+            shieldSound.play();
+          }
           updateHUD();
           spawnSparkles(state.player.x, state.player.y - state.player.r * dpr, 20); // More sparkles for shield
           console.log('Shield collected! Player now has protection.');
@@ -869,6 +1008,18 @@
             if (state.player.hasShield) {
               // Shield protects from frontal hit
               state.player.hasShield = false; // Shield is consumed
+                  // Play shield break sound
+                  if (shieldBreakSound) {
+                    shieldBreakSound.currentTime = 0;
+                    shieldBreakSound.volume = 0.6;
+                    shieldBreakSound.play();
+                  }
+              // Play shield break sound
+              if (shieldBreakSound) {
+                shieldBreakSound.currentTime = 0;
+                shieldBreakSound.volume = 0.6;
+                shieldBreakSound.play();
+              }
               state.objects.splice(i,1);
               shake(2, 120);
               spawnSparkles(state.player.x, state.player.y - state.player.r * dpr, 25); // Shield break effect
@@ -888,6 +1039,12 @@
                 if (state.player.hasShield) {
                   // Shield protects from second side hit (game over)
                   state.player.hasShield = false; // Shield is consumed
+                  // Play shield break sound
+                  if (shieldBreakSound) {
+                    shieldBreakSound.currentTime = 0;
+                    shieldBreakSound.volume = 0.6;
+                    shieldBreakSound.play();
+                  }
                   state.objects.splice(i,1);
                   shake(2, 120);
                   spawnSparkles(state.player.x, state.player.y - state.player.r * dpr, 25); // Shield break effect

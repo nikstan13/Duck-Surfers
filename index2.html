@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="el">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+    <title>Duck Surfers</title>
+    <link rel="preconnect" href="self" />
+        <link rel="stylesheet" href="styles.css?v=1757977233" />
+  </head>
+  <body>
+    <div id="game-root">
+      <div id="hud">
+        <div class="hud-left">
+          <span id="score-label">Score:</span>
+          <span id="score">0</span>
+        </div>
+        <div class="hud-right">
+          <span id="speed-label">Speed:</span>
+          <span id="speed">1.0x</span>
+          <span style="margin-left:12px" id="bonus-label">Bonus:</span>
+          <span id="bonus">0%</span>
+          <span id="cal-readout" class="cal hidden" style="margin-left:12px"></span>
+        </div>
+      </div>
+
+      <canvas id="game" width="480" height="800" aria-label="Duck Surfers"></canvas>
+
+      <div id="tap-to-start" class="overlay">
+        <div class="card">
+          <h1>Duck Surfers</h1>
+          <p>Απέφυγε τα νούφαρα και μάζεψε προσφορές!</p>
+          <ul class="controls">
+            <li>← → ή A/D για μετακίνηση</li>
+            <li>Swipe αριστερά/δεξιά στο κινητό</li>
+            <li>P για παύση</li>
+          </ul>
+          <button id="start-btn">Ξεκίνα</button>
+        </div>
+      </div>
+
+      <div id="paused" class="overlay hidden">
+        <div class="card">
+          <h2>Παύση</h2>
+          <button id="resume-btn">Συνέχισε</button>
+        </div>
+      </div>
+
+      <div id="game-over" class="overlay hidden">
+        <div class="card">
+          <h2>Game Over</h2>
+          <p id="gover-msg">Προσπάθησε ξανά!</p>
+          <p><strong>Τελικό Σκορ:</strong> <span id="final-score">0</span></p>
+          <div id="offer-section" class="hidden">
+            <p id="offer-desc">Κέρδισες προσφορά για το Drop 🎁</p>
+            <div class="code-row">
+              <code id="offer-code">DUCKDROP-XXXXXX</code>
+              <button id="copy-code">Αντιγραφή</button>
+            </div>
+          </div>
+          <div class="actions">
+            <button id="restart-btn" class="primary">Ξαναπαίξε</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="game.js?v=1757977233"></script>
+  </body>
+  </html>
