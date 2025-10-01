@@ -585,8 +585,9 @@
       try { riverVideo.play().catch(()=>{}); } catch {}
     }
     
-    // Restart music when game starts (if music toggle is enabled)
+    // Restart music from beginning when game starts (if music toggle is enabled)
     if (backgroundMusic && musicToggleCheckbox && !musicToggleCheckbox.checked) {
+      backgroundMusic.currentTime = 0; // Reset to beginning
       backgroundMusic.volume = 0.3;
       backgroundMusic.play().catch(e => console.log('Music restart blocked:', e));
     }
