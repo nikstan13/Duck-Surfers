@@ -584,6 +584,13 @@
     if (riverVideo) {
       try { riverVideo.play().catch(()=>{}); } catch {}
     }
+    
+    // Restart music when game starts (if music toggle is enabled)
+    if (backgroundMusic && musicToggleCheckbox && !musicToggleCheckbox.checked) {
+      backgroundMusic.volume = 0.3;
+      backgroundMusic.play().catch(e => console.log('Music restart blocked:', e));
+    }
+    
     if (calReadout) calReadout.classList.add('hidden');
     updateHUD();
     state.t = performance.now();
