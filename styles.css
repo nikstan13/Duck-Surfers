@@ -24,20 +24,73 @@ body {
   overscroll-behavior: none;
 }
 
+/* Mobile full-screen adjustments */
+@media (max-width: 767px) {
+  #game-root {
+    height: 100vh;
+    height: 100dvh;
+    padding: 0;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  /* Ensure proper scaling on mobile */
+  body {
+    overflow: hidden;
+  }
+}
+
 canvas#game {
-  width: min(100vw, 560px);
   /* Better touch handling */
   touch-action: none;
-  height: calc(min(100vw, 560px) * (800/480));
-  max-height: 95dvh;
-  border-radius: 16px;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.35);
   background: #1a4d7a; /* river tint; actual river drawn in canvas */
+  /* Default desktop sizing */
+  width: min(100vw, 560px);
+  height: calc(min(100vw, 560px) * (800/480));
+  max-height: 95vh;
+  border-radius: 16px;
+  box-shadow: 0 8px 25px rgba(0,0,0,0.4);
+}
+
+/* Mobile portrait: use full width, maintain aspect ratio */
+@media (max-width: 767px) and (orientation: portrait) {
+  canvas#game {
+    width: 100vw;
+    height: calc(100vw * (800/480));
+    max-height: calc(100vh - 60px); /* Leave space for browser UI */
+    border-radius: 0;
+    box-shadow: none;
+  }
+  
+  /* If calculated height is too tall, scale by height instead */
+  @supports (height: 100dvh) {
+    canvas#game {
+      max-height: calc(100dvh - 60px);
+    }
+  }
+}
+
+/* Mobile landscape: use full height, maintain aspect ratio */
+@media (max-width: 767px) and (orientation: landscape) {
+  canvas#game {
+    width: calc((100vh - 40px) * (480/800));
+    height: calc(100vh - 40px);
+    max-width: 100vw;
+    border-radius: 0;
+    box-shadow: none;
+  }
+  
+  @supports (height: 100dvh) {
+    canvas#game {
+      height: calc(100dvh - 40px);
+      width: calc((100dvh - 40px) * (480/800));
+    }
+  }
 }
 
 #hud {
   position: absolute;
-  top: 12px;
+  top: 8px;
   left: 50%;
   transform: translateX(-50%);
   display: flex;
@@ -45,6 +98,16 @@ canvas#game {
   opacity: 0;
   visibility: hidden;
   transition: opacity 0.3s ease, visibility 0.3s ease;
+  z-index: 10;
+}
+
+/* Mobile HUD adjustments */
+@media (max-width: 767px) {
+  #hud {
+    top: 4px;
+    width: 90%;
+    max-width: none;
+  }
 }
 
 #hud.visible {
@@ -60,6 +123,22 @@ canvas#game {
   align-items: center;
   gap: 20px;
   box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.3);
+}
+
+/* Mobile HUD bar adjustments */
+@media (max-width: 767px) {
+  .hud-bar {
+    padding: 10px 16px;
+    gap: 16px;
+    border-radius: 25px;
+    width: 100%;
+    justify-content: space-between;
+  }
+  
+  .hud-item {
+    font-size: 13px;
+    gap: 4px;
+  }
 }
 
 .hud-item {
