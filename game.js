@@ -91,15 +91,23 @@
   const noufaroSound = document.getElementById('noufaro-sound');
   const shieldSound = document.getElementById('shield-sound');
   const shieldBreakSound = document.getElementById('shieldbreak-sound');
+  
+  // Debug: Check if sound elements exist
+  console.log('Sound elements loaded:');
+  console.log('- noufaroSound:', !!noufaroSound);
+  console.log('- shieldSound:', !!shieldSound);
+  console.log('- shieldBreakSound:', !!shieldBreakSound);
 
   // Global audio state - controls all sounds (music + effects)
   let audioEnabled = true;
 
   // Helper function to play sounds only if audio is enabled
   function playSound(audioElement) {
-    console.log('PlaySound called:', audioElement?.id || 'unknown', 'audioEnabled:', audioEnabled);
     if (audioEnabled && audioElement) {
+      console.log('Playing sound:', audioElement.id, 'Volume:', audioElement.volume);
       audioElement.play().catch(e => console.log('Sound blocked:', e));
+    } else {
+      console.log('Sound NOT played:', audioElement?.id || 'unknown', 'audioEnabled:', audioEnabled);
     }
   }
 
@@ -565,8 +573,8 @@
 
   // Audio toggle functionality - controls all sounds (music + effects)
   if (musicToggleCheckbox && backgroundMusic) {
-    // Initialize: sounds should be enabled by default, regardless of checkbox initial state
-    audioEnabled = true;
+    // Initialize audio state: checked = muted (false), unchecked = unmuted (true)
+    audioEnabled = !musicToggleCheckbox.checked;
     
     musicToggleCheckbox.addEventListener('change', () => {
       if (!musicToggleCheckbox.checked) {
