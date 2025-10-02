@@ -109,6 +109,9 @@
 
   // Global audio state - controls all sounds (music + effects)
   let audioEnabled = true;
+  
+  // Global player name - set once at game start
+  let globalPlayerName = null;
 
   // Helper function to play sounds instantly if audio is enabled
   function playSound(audioElement) {
@@ -583,43 +586,9 @@
   });
 
   // Firebase Leaderboard Event Listeners
-  const submitScoreBtn = document.getElementById('submit-score-btn');
   const showLeaderboardBtn = document.getElementById('show-leaderboard-btn');
   const closeLeaderboardBtn = document.getElementById('close-leaderboard-btn');
-  const playerNameInput = document.getElementById('player-name');
   const leaderboardOverlay = document.getElementById('leaderboard-overlay');
-
-  if (submitScoreBtn && playerNameInput) {
-    submitScoreBtn.addEventListener('click', async () => {
-      const playerName = playerNameInput.value.trim();
-      if (!playerName) {
-        alert('Παρακαλώ εισάγετε το όνομά σας');
-        return;
-      }
-
-      submitScoreBtn.disabled = true;
-      submitScoreBtn.textContent = 'Καταχώρηση...';
-
-      try {
-        const success = await window.submitScore(playerName, Math.floor(state.score));
-        if (success) {
-          alert('🎉 Νέο υψηλό σκορ καταχωρήθηκε!');
-        } else {
-          alert('Το σκορ σας δεν είναι υψηλότερο από το προηγούμενο.');
-        }
-        
-        // Hide score submission after attempt
-        const scoreSubmissionEl = document.getElementById('score-submission');
-        if (scoreSubmissionEl) scoreSubmissionEl.classList.add('hidden');
-      } catch (error) {
-        console.error('Score submission error:', error);
-        alert('Σφάλμα κατά την καταχώρηση του σκορ');
-      }
-
-      submitScoreBtn.disabled = false;
-      submitScoreBtn.textContent = 'Καταχώρηση Σκορ';
-    });
-  }
 
   if (showLeaderboardBtn && leaderboardOverlay) {
     showLeaderboardBtn.addEventListener('click', async () => {
@@ -632,6 +601,21 @@
     closeLeaderboardBtn.addEventListener('click', () => {
       leaderboardOverlay.classList.add('hidden');
     });
+  }
+
+  // Player name input validation and Enter key support
+  const initialPlayerNameInput = document.getElementById('initial-player-name');
+  if (initialPlayerNameInput) {
+    initialPlayerNameInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        start();
+      }
+    });
+    
+    // Focus on the input when page loads
+    setTimeout(() => {
+      initialPlayerNameInput.focus();
+    }, 500);
   }
 
   // Audio toggle functionality - controls all sounds (music + effects)
@@ -655,6 +639,22 @@
 
   function start(){
     if (state.started) return;
+    
+    // Get player name if not already set (first time playing)
+    if (!globalPlayerName) {
+      const initialPlayerNameInput = document.getElementById('initial-player-name');
+      if (initialPlayerNameInput) {
+        const playerName = initialPlayerNameInput.value.trim();
+        if (!playerName) {
+          alert('Παρακαλώ εισάγετε το όνομά σας πρώτα!');
+          initialPlayerNameInput.focus();
+          return;
+        }
+        globalPlayerName = playerName;
+        console.log('Player name set to:', globalPlayerName);
+      }
+    }
+    
     // Load video only when game starts (not on page load)
     ensureRiverVideo();
     state.gameOver = false;
@@ -732,12 +732,33 @@
       if (goverMsgEl) goverMsgEl.textContent = 'Game Over — δεν κέρδισες προσφορά αυτή τη φορά.';
     }
     
-    // Show score submission for high scores (above 100)
-    const scoreSubmissionEl = document.getElementById('score-submission');
-    if (scoreSubmissionEl && Math.floor(state.score) > 100) {
-      scoreSubmissionEl.classList.remove('hidden');
-    } else if (scoreSubmissionEl) {
-      scoreSubmissionEl.classList.add('hidden');
+    // Automatic score submission for scores above 100
+    const scoreStatusEl = document.getElementById('score-status');
+    const scoreMessageEl = document.getElementById('score-message');
+    
+    if (globalPlayerName && Math.floor(state.score) > 100 && window.submitScore) {
+      if (scoreStatusEl) scoreStatusEl.classList.remove('hidden');
+      if (scoreMessageEl) scoreMessageEl.textContent = 'Καταχώρηση σκορ...';
+      
+      // Submit score automatically
+      window.submitScore(globalPlayerName, Math.floor(state.score))
+        .then(success => {
+          if (scoreMessageEl) {
+            if (success) {
+              scoreMessageEl.innerHTML = '🎉 Νέο υψηλό σκορ καταχωρήθηκε!';
+            } else {
+              scoreMessageEl.textContent = 'Το σκορ καταχωρήθηκε (δεν είναι νέο ρεκόρ)';
+            }
+          }
+        })
+        .catch(error => {
+          console.error('Auto score submission error:', error);
+          if (scoreMessageEl) {
+            scoreMessageEl.textContent = 'Σφάλμα καταχώρησης σκορ';
+          }
+        });
+    } else if (scoreStatusEl) {
+      scoreStatusEl.classList.add('hidden');
     }
     
     if (overlayGameOver) overlayGameOver.classList.remove('hidden');

@@ -641,7 +641,7 @@ button.secondary { background: #8aa7c4; box-shadow: 0 2px 0 #69839e; }
 button.primary { background: #ffd166; box-shadow: 0 2px 0 #e6b34d; color: #0b2239; }
 
 /* Firebase Leaderboard Styles */
-#score-submission {
+#player-setup {
   margin: 16px 0;
   padding: 16px;
   background: rgba(255,255,255,0.05);
@@ -649,14 +649,23 @@ button.primary { background: #ffd166; box-shadow: 0 2px 0 #e6b34d; color: #0b223
   border: 1px solid rgba(255,255,255,0.1);
 }
 
-#score-submission label {
+#score-status {
+  margin: 16px 0;
+  padding: 16px;
+  background: rgba(255,255,255,0.05);
+  border-radius: 8px;
+  border: 1px solid rgba(255,255,255,0.1);
+  text-align: center;
+}
+
+#player-setup label {
   display: block;
   margin-bottom: 8px;
   font-weight: 600;
   color: #fff;
 }
 
-#player-name {
+#initial-player-name {
   width: 100%;
   padding: 8px 12px;
   margin-bottom: 12px;
@@ -667,11 +676,11 @@ button.primary { background: #ffd166; box-shadow: 0 2px 0 #e6b34d; color: #0b223
   font-size: 14px;
 }
 
-#player-name::placeholder {
+#initial-player-name::placeholder {
   color: rgba(255,255,255,0.6);
 }
 
-#player-name:focus {
+#initial-player-name:focus {
   outline: none;
   border-color: #17b890;
   background: rgba(255,255,255,0.15);
@@ -768,7 +777,7 @@ button.primary { background: #ffd166; box-shadow: 0 2px 0 #e6b34d; color: #0b223
     font-size: 14px;
   }
   
-  #player-name {
+  #initial-player-name {
     font-size: 16px; /* Prevent zoom on iOS */
   }
 }

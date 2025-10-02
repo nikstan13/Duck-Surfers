@@ -73,6 +73,12 @@
             <div class="spinner"></div>
             <span>Φόρτωση βίντεο...</span>
           </div>
+          
+          <div id="player-setup">
+            <label for="initial-player-name">Όνομα Παίκτη:</label>
+            <input type="text" id="initial-player-name" placeholder="Εισάγετε το όνομά σας" maxlength="20">
+          </div>
+          
           <button id="start-btn">Ξεκίνα</button>
         </div>
       </div>
@@ -96,10 +102,8 @@
               <button id="copy-code">Αντιγραφή</button>
             </div>
           </div>
-          <div id="score-submission" class="hidden">
-            <label for="player-name">Όνομα Παίκτη:</label>
-            <input type="text" id="player-name" placeholder="Εισάγετε το όνομα σας" maxlength="20">
-            <button id="submit-score-btn">Καταχώρηση Σκορ</button>
+          <div id="score-status" class="hidden">
+            <p id="score-message">Καταχώρηση σκορ...</p>
           </div>
           <div class="actions">
             <button id="show-leaderboard-btn">Κατάταξη</button>
