@@ -92,6 +92,16 @@
   const shieldSound = document.getElementById('shield-sound');
   const shieldBreakSound = document.getElementById('shieldbreak-sound');
 
+  // Global audio state - controls all sounds (music + effects)
+  let audioEnabled = true;
+
+  // Helper function to play sounds only if audio is enabled
+  function playSound(audioElement) {
+    if (audioEnabled && audioElement) {
+      audioElement.play().catch(e => console.log('Sound blocked:', e));
+    }
+  }
+
   // Device pixel ratio with mobile compensation
   let dpr = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
   const isMobile = /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth < 768;
@@ -552,15 +562,17 @@
     try { await navigator.clipboard.writeText(code); if (copyBtn) { copyBtn.textContent = 'Αντιγράφηκε!'; setTimeout(()=> { if (copyBtn) copyBtn.textContent='Αντιγραφή' }, 1200); } } catch {}
   });
 
-  // Music toggle functionality
+  // Audio toggle functionality - controls all sounds (music + effects)
   if (musicToggleCheckbox && backgroundMusic) {
     musicToggleCheckbox.addEventListener('change', () => {
       if (!musicToggleCheckbox.checked) {
-        // Unchecked = unmuted = music plays
+        // Unchecked = unmuted = all audio plays
+        audioEnabled = true;
         backgroundMusic.volume = 0.3; // Set volume to 30%
         backgroundMusic.play().catch(e => console.log('Music autoplay blocked:', e));
       } else {
-        // Checked = muted = music stops
+        // Checked = muted = all audio stops
+        audioEnabled = false;
         backgroundMusic.pause();
       }
     });
@@ -585,8 +597,8 @@
       try { riverVideo.play().catch(()=>{}); } catch {}
     }
     
-    // Restart music from beginning when game starts (if music toggle is enabled)
-    if (backgroundMusic && musicToggleCheckbox && !musicToggleCheckbox.checked) {
+    // Restart music from beginning when game starts (if audio is enabled)
+    if (backgroundMusic && audioEnabled && musicToggleCheckbox && !musicToggleCheckbox.checked) {
       backgroundMusic.currentTime = 0; // Reset to beginning
       backgroundMusic.volume = 0.3;
       backgroundMusic.play().catch(e => console.log('Music restart blocked:', e));
@@ -619,11 +631,11 @@
       backgroundMusic.pause();
     }
     
-    // Play game over sound
-    if (gameoverSound) {
+    // Play game over sound (only if audio enabled)
+    if (audioEnabled && gameoverSound) {
       gameoverSound.currentTime = 0; // Reset to start
       gameoverSound.volume = 0.5; // Set volume to 50%
-      gameoverSound.play().catch(e => console.log('Game over sound blocked:', e));
+      playSound(gameoverSound);
     }
     
     // Update Game Over UI
@@ -901,7 +913,7 @@
           if (noufaroSound) {
             noufaroSound.currentTime = 0;
             noufaroSound.volume = 0.7;
-            noufaroSound.play();
+            playSound(noufaroSound);
           }
           updateHUD();
           spawnSparkles(state.player.x, state.player.y - state.player.r * dpr, 14);
@@ -929,13 +941,13 @@
                   if (shieldBreakSound) {
                     shieldBreakSound.currentTime = 0;
                     shieldBreakSound.volume = 0.6;
-                    shieldBreakSound.play();
+                    playSound(shieldBreakSound);
                   }
               // Play shield break sound
               if (shieldBreakSound) {
                 shieldBreakSound.currentTime = 0;
                 shieldBreakSound.volume = 0.6;
-                shieldBreakSound.play();
+                playSound(shieldBreakSound);
               }
               state.objects.splice(i,1);
               shake(2, 120);
@@ -960,7 +972,7 @@
                   if (shieldBreakSound) {
                     shieldBreakSound.currentTime = 0;
                     shieldBreakSound.volume = 0.6;
-                    shieldBreakSound.play();
+                    playSound(shieldBreakSound);
                   }
                   state.objects.splice(i,1);
                   shake(2, 120);
@@ -991,7 +1003,7 @@
           if (shieldSound) {
             shieldSound.currentTime = 0;
             shieldSound.volume = 0.6;
-            shieldSound.play();
+            playSound(shieldSound);
           }
           updateHUD();
           spawnSparkles(state.player.x, state.player.y - state.player.r * dpr, 20); // More sparkles for shield
@@ -1020,13 +1032,13 @@
                   if (shieldBreakSound) {
                     shieldBreakSound.currentTime = 0;
                     shieldBreakSound.volume = 0.6;
-                    shieldBreakSound.play();
+                    playSound(shieldBreakSound);
                   }
               // Play shield break sound
               if (shieldBreakSound) {
                 shieldBreakSound.currentTime = 0;
                 shieldBreakSound.volume = 0.6;
-                shieldBreakSound.play();
+                playSound(shieldBreakSound);
               }
               state.objects.splice(i,1);
               shake(2, 120);
@@ -1051,7 +1063,7 @@
                   if (shieldBreakSound) {
                     shieldBreakSound.currentTime = 0;
                     shieldBreakSound.volume = 0.6;
-                    shieldBreakSound.play();
+                    playSound(shieldBreakSound);
                   }
                   state.objects.splice(i,1);
                   shake(2, 120);

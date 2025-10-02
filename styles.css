@@ -18,15 +18,17 @@ body {
 }
 
 /* Mobile full screen body */
-@media (max-width: 767px) {
+@media (max-width: 767px), (max-height: 767px) {
   html, body {
-    height: 100vh;
-    height: 100dvh;
-    width: 100vw;
+    height: 100vh !important;
+    height: 100dvh !important;
+    width: 100vw !important;
     margin: 0 !important;
     padding: 0 !important;
     overflow: hidden !important;
     position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
   }
 }
 
@@ -42,8 +44,8 @@ body {
   overscroll-behavior: none;
 }
 
-/* Mobile full-screen adjustments */
-@media (max-width: 767px) {
+/* Mobile full-screen adjustments - FORCE FULL SCREEN */
+@media (max-width: 767px), (max-height: 767px) {
   #game-root {
     position: fixed !important;
     top: 0 !important;
@@ -59,6 +61,7 @@ body {
     justify-content: flex-start !important;
     flex-direction: column !important;
     overflow: hidden !important;
+    background: #0b2239 !important;
   }
 }
 
