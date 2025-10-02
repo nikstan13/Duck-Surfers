@@ -565,8 +565,8 @@
 
   // Audio toggle functionality - controls all sounds (music + effects)
   if (musicToggleCheckbox && backgroundMusic) {
-    // Initialize audio state based on checkbox state
-    audioEnabled = !musicToggleCheckbox.checked;
+    // Initialize: sounds should be enabled by default, regardless of checkbox initial state
+    audioEnabled = true;
     
     musicToggleCheckbox.addEventListener('change', () => {
       if (!musicToggleCheckbox.checked) {
