@@ -582,6 +582,58 @@
     try { await navigator.clipboard.writeText(code); if (copyBtn) { copyBtn.textContent = 'Αντιγράφηκε!'; setTimeout(()=> { if (copyBtn) copyBtn.textContent='Αντιγραφή' }, 1200); } } catch {}
   });
 
+  // Firebase Leaderboard Event Listeners
+  const submitScoreBtn = document.getElementById('submit-score-btn');
+  const showLeaderboardBtn = document.getElementById('show-leaderboard-btn');
+  const closeLeaderboardBtn = document.getElementById('close-leaderboard-btn');
+  const playerNameInput = document.getElementById('player-name');
+  const leaderboardOverlay = document.getElementById('leaderboard-overlay');
+
+  if (submitScoreBtn && playerNameInput) {
+    submitScoreBtn.addEventListener('click', async () => {
+      const playerName = playerNameInput.value.trim();
+      if (!playerName) {
+        alert('Παρακαλώ εισάγετε το όνομά σας');
+        return;
+      }
+
+      submitScoreBtn.disabled = true;
+      submitScoreBtn.textContent = 'Καταχώρηση...';
+
+      try {
+        const success = await window.submitScore(playerName, Math.floor(state.score));
+        if (success) {
+          alert('🎉 Νέο υψηλό σκορ καταχωρήθηκε!');
+        } else {
+          alert('Το σκορ σας δεν είναι υψηλότερο από το προηγούμενο.');
+        }
+        
+        // Hide score submission after attempt
+        const scoreSubmissionEl = document.getElementById('score-submission');
+        if (scoreSubmissionEl) scoreSubmissionEl.classList.add('hidden');
+      } catch (error) {
+        console.error('Score submission error:', error);
+        alert('Σφάλμα κατά την καταχώρηση του σκορ');
+      }
+
+      submitScoreBtn.disabled = false;
+      submitScoreBtn.textContent = 'Καταχώρηση Σκορ';
+    });
+  }
+
+  if (showLeaderboardBtn && leaderboardOverlay) {
+    showLeaderboardBtn.addEventListener('click', async () => {
+      leaderboardOverlay.classList.remove('hidden');
+      await window.showLeaderboard(10); // Show top 10
+    });
+  }
+
+  if (closeLeaderboardBtn && leaderboardOverlay) {
+    closeLeaderboardBtn.addEventListener('click', () => {
+      leaderboardOverlay.classList.add('hidden');
+    });
+  }
+
   // Audio toggle functionality - controls all sounds (music + effects)
   if (musicToggleCheckbox && backgroundMusic) {
     // Initialize audio state: checked = muted (false), unchecked = unmuted (true)
@@ -679,6 +731,15 @@
       if (offerSectionEl) offerSectionEl.classList.add('hidden');
       if (goverMsgEl) goverMsgEl.textContent = 'Game Over — δεν κέρδισες προσφορά αυτή τη φορά.';
     }
+    
+    // Show score submission for high scores (above 100)
+    const scoreSubmissionEl = document.getElementById('score-submission');
+    if (scoreSubmissionEl && Math.floor(state.score) > 100) {
+      scoreSubmissionEl.classList.remove('hidden');
+    } else if (scoreSubmissionEl) {
+      scoreSubmissionEl.classList.add('hidden');
+    }
+    
     if (overlayGameOver) overlayGameOver.classList.remove('hidden');
   }
 

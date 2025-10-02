@@ -16,6 +16,10 @@
     <link rel="preload" href="Assets/mobileriver.mov" as="video" type="video/quicktime" />
     <link rel="preload" href="game.js" as="script" />
         <link rel="stylesheet" href="styles.css?v=1759247265" />
+    
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.0.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.0.0/firebase-firestore-compat.js"></script>
   </head>
   <body>
     <div id="game-root">
@@ -92,8 +96,28 @@
               <button id="copy-code">Αντιγραφή</button>
             </div>
           </div>
+          <div id="score-submission" class="hidden">
+            <label for="player-name">Όνομα Παίκτη:</label>
+            <input type="text" id="player-name" placeholder="Εισάγετε το όνομα σας" maxlength="20">
+            <button id="submit-score-btn">Καταχώρηση Σκορ</button>
+          </div>
           <div class="actions">
+            <button id="show-leaderboard-btn">Κατάταξη</button>
             <button id="restart-btn" class="primary">Ξαναπαίξε</button>
+          </div>
+        </div>
+      </div>
+
+      <div id="leaderboard-overlay" class="overlay hidden">
+        <div class="card">
+          <h2>🏆 Κατάταξη</h2>
+          <div id="leaderboard-loading" class="loading-indicator">
+            <div class="spinner"></div>
+            <span>Φόρτωση κατάταξης...</span>
+          </div>
+          <ul id="leaderboard" class="hidden"></ul>
+          <div class="actions">
+            <button id="close-leaderboard-btn">Κλείσιμο</button>
           </div>
         </div>
       </div>
@@ -119,6 +143,7 @@
       <source src="Assets/shieldbreak.mp3" type="audio/mpeg">
     </audio>
 
+    <script src="firebase-leaderboard.js"></script>
     <script src="game.js?v=1759247265"></script>
   </body>
   </html>

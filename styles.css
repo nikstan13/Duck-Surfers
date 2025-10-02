@@ -640,6 +640,139 @@ button:active { transform: translateY(1px); box-shadow: 0 1px 0 #0b8c70; }
 button.secondary { background: #8aa7c4; box-shadow: 0 2px 0 #69839e; }
 button.primary { background: #ffd166; box-shadow: 0 2px 0 #e6b34d; color: #0b2239; }
 
+/* Firebase Leaderboard Styles */
+#score-submission {
+  margin: 16px 0;
+  padding: 16px;
+  background: rgba(255,255,255,0.05);
+  border-radius: 8px;
+  border: 1px solid rgba(255,255,255,0.1);
+}
+
+#score-submission label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 600;
+  color: #fff;
+}
+
+#player-name {
+  width: 100%;
+  padding: 8px 12px;
+  margin-bottom: 12px;
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 6px;
+  background: rgba(255,255,255,0.1);
+  color: #fff;
+  font-size: 14px;
+}
+
+#player-name::placeholder {
+  color: rgba(255,255,255,0.6);
+}
+
+#player-name:focus {
+  outline: none;
+  border-color: #17b890;
+  background: rgba(255,255,255,0.15);
+}
+
+#submit-score-btn {
+  background: #17b890;
+  color: white;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background 0.2s;
+}
+
+#submit-score-btn:hover {
+  background: #15a378;
+}
+
+#submit-score-btn:disabled {
+  background: #666;
+  cursor: not-allowed;
+}
+
+/* Leaderboard Styles */
+#leaderboard {
+  list-style: none;
+  padding: 0;
+  margin: 16px 0;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.leaderboard-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  margin: 4px 0;
+  background: rgba(255,255,255,0.05);
+  border-radius: 8px;
+  border: 1px solid rgba(255,255,255,0.1);
+  transition: background 0.2s;
+}
+
+.leaderboard-item:hover {
+  background: rgba(255,255,255,0.1);
+}
+
+.leaderboard-item .rank {
+  font-weight: bold;
+  min-width: 60px;
+  font-size: 16px;
+}
+
+.leaderboard-item .player-name {
+  flex: 1;
+  margin: 0 12px;
+  font-weight: 600;
+  text-align: left;
+}
+
+.leaderboard-item .score {
+  font-weight: bold;
+  color: #ffd166;
+  font-size: 16px;
+}
+
+.no-scores, .error {
+  text-align: center;
+  padding: 20px;
+  color: rgba(255,255,255,0.7);
+  font-style: italic;
+}
+
+.error {
+  color: #ff6b6b;
+}
+
+/* Mobile responsive adjustments */
+@media (max-width: 767px) {
+  .leaderboard-item {
+    padding: 8px 12px;
+    font-size: 14px;
+  }
+  
+  .leaderboard-item .rank {
+    min-width: 50px;
+    font-size: 14px;
+  }
+  
+  .leaderboard-item .score {
+    font-size: 14px;
+  }
+  
+  #player-name {
+    font-size: 16px; /* Prevent zoom on iOS */
+  }
+}
+
 .code-row {
   display: flex; gap: 8px; align-items: center;
   background: #0c2a47; padding: 8px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.06);
