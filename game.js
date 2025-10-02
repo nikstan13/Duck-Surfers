@@ -97,6 +97,7 @@
 
   // Helper function to play sounds only if audio is enabled
   function playSound(audioElement) {
+    console.log('PlaySound called:', audioElement?.id || 'unknown', 'audioEnabled:', audioEnabled);
     if (audioEnabled && audioElement) {
       audioElement.play().catch(e => console.log('Sound blocked:', e));
     }
@@ -564,6 +565,9 @@
 
   // Audio toggle functionality - controls all sounds (music + effects)
   if (musicToggleCheckbox && backgroundMusic) {
+    // Initialize audio state based on checkbox state
+    audioEnabled = !musicToggleCheckbox.checked;
+    
     musicToggleCheckbox.addEventListener('change', () => {
       if (!musicToggleCheckbox.checked) {
         // Unchecked = unmuted = all audio plays
