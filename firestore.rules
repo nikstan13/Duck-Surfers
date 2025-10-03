@@ -1,0 +1,45 @@
+// Firestore Security Rules for Duck Surfers Leaderboard
+// Copy these rules to Firebase Console → Firestore Database → Rules
+
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Leaderboard collection rules
+    match /leaderboard/{playerId} {
+      // Allow anyone to read leaderboard
+      allow read: if true;
+      
+      // Allow writes only if:
+      // 1. Creating a new player document
+      // 2. Updating existing player with higher score
+      allow create: if request.auth == null 
+        && isValidPlayerData(request.data)
+        && request.data.gamesPlayed == 1;
+        
+      allow update: if request.auth == null
+        && isValidPlayerData(request.data)
+        && (
+          // Allow score updates only if new score is higher
+          request.data.score > resource.data.score ||
+          // Allow games played increment without score change
+          (request.data.score == resource.data.score && 
+           request.data.gamesPlayed > resource.data.gamesPlayed)
+        );
+      
+      // No delete allowed
+      allow delete: if false;
+    }
+    
+    // Helper function to validate player data
+    function isValidPlayerData(data) {
+      return data.keys().hasAll(['playerName', 'score', 'gamesPlayed', 'lastUpdated']) &&
+             data.playerName is string &&
+             data.playerName.size() > 0 &&
+             data.playerName.size() <= 20 &&
+             data.score is number &&
+             data.score >= 0 &&
+             data.gamesPlayed is number &&
+             data.gamesPlayed > 0;
+    }
+  }
+}

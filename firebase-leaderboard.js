@@ -1,26 +1,61 @@
 // Firebase Leaderboard System for Duck Surfers
-// Προσθέστε το δικό σας firebaseConfig εδώ
+// Configuration is loaded from firebase-config.js
 
-const firebaseConfig = {
-  // Αντικαταστήστε με τα δικά σας στοιχεία από το Firebase Console
-  apiKey: "YOUR_API_KEY",
-  authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
-  projectId: "YOUR_PROJECT_ID", 
-  storageBucket: "YOUR_PROJECT_ID.appspot.com",
-  messagingSenderId: "YOUR_SENDER_ID",
-  appId: "YOUR_APP_ID"
-};
+// Wait for firebaseConfig to be loaded
+function waitForConfig() {
+  return new Promise((resolve) => {
+    if (window.firebaseConfig) {
+      resolve(window.firebaseConfig);
+    } else {
+      setTimeout(() => waitForConfig().then(resolve), 100);
+    }
+  });
+}
 
 // Initialize Firebase
 let db;
-try {
-  if (!firebase.apps.length) {
-    firebase.initializeApp(firebaseConfig);
+let firebaseReady = false;
+
+// Initialize Firebase when config is ready
+async function initializeFirebase() {
+  try {
+    const config = await waitForConfig();
+    
+    if (!firebase.apps.length) {
+      firebase.initializeApp(config);
+      console.log('Firebase app initialized with project:', config.projectId);
+    }
+    
+    db = firebase.firestore();
+    firebaseReady = true;
+    console.log('Firebase Firestore initialized successfully');
+    
+    // Test connection
+    await testConnection();
+    
+  } catch (error) {
+    console.error('Firebase initialization error:', error);
+    firebaseReady = false;
   }
-  db = firebase.firestore();
-  console.log('Firebase Firestore initialized successfully');
-} catch (error) {
-  console.error('Firebase initialization error:', error);
+}
+
+// Test Firebase connection
+async function testConnection() {
+  try {
+    // Try to read from Firestore (will create the collection if it doesn't exist)
+    const testRef = db.collection('leaderboard').limit(1);
+    await testRef.get();
+    console.log('✅ Firebase connection test successful');
+  } catch (error) {
+    console.error('❌ Firebase connection test failed:', error);
+  }
+}
+
+// Initialize when DOM is ready
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initializeFirebase);
+} else {
+  initializeFirebase();
 }
 
 /**
@@ -30,8 +65,8 @@ try {
  * @returns {Promise<boolean>} - true αν η καταχώρηση ήταν επιτυχής
  */
 async function submitScore(playerName, score) {
-  if (!db) {
-    console.error('Firebase not initialized');
+  if (!firebaseReady || !db) {
+    console.error('Firebase not ready yet');
     return false;
   }
 
@@ -95,8 +130,13 @@ async function showLeaderboard(limit = 10) {
   const leaderboardElement = document.getElementById('leaderboard');
   const loadingElement = document.getElementById('leaderboard-loading');
   
-  if (!db) {
-    console.error('Firebase not initialized');
+  if (!firebaseReady || !db) {
+    console.error('Firebase not ready yet');
+    if (leaderboardElement) {
+      leaderboardElement.innerHTML = '<li class="error">Firebase δεν είναι συνδεδεμένο</li>';
+      leaderboardElement.classList.remove('hidden');
+    }
+    if (loadingElement) loadingElement.classList.add('hidden');
     return;
   }
 
