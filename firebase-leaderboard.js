@@ -39,15 +39,28 @@ async function initializeFirebase() {
   }
 }
 
-// Test Firebase connection
+// Test Firebase connection with GitHub Pages specific error handling
 async function testConnection() {
   try {
     // Try to read from Firestore (will create the collection if it doesn't exist)
     const testRef = db.collection('leaderboard').limit(1);
     await testRef.get();
-    console.log('✅ Firebase connection test successful');
+    console.log('✅ Firebase connection test successful on', window.location.hostname);
   } catch (error) {
     console.error('❌ Firebase connection test failed:', error);
+    
+    // Provide GitHub Pages specific troubleshooting
+    if (error.code === 'permission-denied' || error.code === 'unauthenticated') {
+      console.log('🔧 GitHub Pages Troubleshooting:');
+      console.log('1. Check Firestore Rules - make sure they allow unauthenticated read/write');
+      console.log('2. Add domain to Firebase Console → Authentication → Authorized domains');
+      console.log('3. Ensure your domain:', window.location.hostname);
+    }
+    
+    if (error.code === 'failed-precondition' || error.message.includes('CORS')) {
+      console.log('🌐 CORS Issue - Firebase may be blocking cross-origin requests');
+      console.log('Check Firebase Console → Project Settings → Authorized domains');
+    }
   }
 }
 
@@ -66,8 +79,8 @@ if (document.readyState === 'loading') {
  */
 async function submitScore(playerName, score) {
   if (!firebaseReady || !db) {
-    console.error('Firebase not ready yet');
-    return false;
+    console.warn('Firebase not ready - using localStorage fallback');
+    return submitScoreOffline(playerName, score);
   }
 
   if (!playerName || !playerName.trim()) {
@@ -214,6 +227,108 @@ async function testFirebaseConnection() {
     return false;
   }
 }
+
+// Offline fallback system for GitHub Pages compatibility
+function submitScoreOffline(playerName, score) {
+  try {
+    const scores = JSON.parse(localStorage.getItem('duck-surfers-scores') || '[]');
+    const existingPlayer = scores.find(p => p.playerName === playerName);
+    
+    if (existingPlayer) {
+      if (score > existingPlayer.score) {
+        existingPlayer.score = score;
+        existingPlayer.gamesPlayed++;
+        localStorage.setItem('duck-surfers-scores', JSON.stringify(scores));
+        console.log('💾 Offline: Updated high score for', playerName);
+        return true;
+      } else {
+        existingPlayer.gamesPlayed++;
+        localStorage.setItem('duck-surfers-scores', JSON.stringify(scores));
+        return false;
+      }
+    } else {
+      scores.push({
+        playerName,
+        score,
+        gamesPlayed: 1,
+        timestamp: Date.now()
+      });
+      localStorage.setItem('duck-surfers-scores', JSON.stringify(scores));
+      console.log('💾 Offline: New player added', playerName);
+      return true;
+    }
+  } catch (error) {
+    console.error('Offline storage error:', error);
+    return false;
+  }
+}
+
+function showLeaderboardOffline() {
+  const leaderboardElement = document.getElementById('leaderboard');
+  const loadingElement = document.getElementById('leaderboard-loading');
+  
+  if (loadingElement) loadingElement.classList.add('hidden');
+  
+  try {
+    const scores = JSON.parse(localStorage.getItem('duck-surfers-scores') || '[]');
+    scores.sort((a, b) => b.score - a.score);
+    
+    if (leaderboardElement) {
+      leaderboardElement.innerHTML = '';
+      
+      if (scores.length === 0) {
+        leaderboardElement.innerHTML = '<li class="no-scores">💾 Offline mode - Δεν υπάρχουν σκορ ακόμη!</li>';
+      } else {
+        scores.slice(0, 10).forEach((data, index) => {
+          const rank = index + 1;
+          let rankDisplay = `#${rank}`;
+          if (rank === 1) rankDisplay = '🥇 #1';
+          else if (rank === 2) rankDisplay = '🥈 #2'; 
+          else if (rank === 3) rankDisplay = '🥉 #3';
+          
+          const listItem = document.createElement('li');
+          listItem.className = 'leaderboard-item';
+          listItem.innerHTML = `
+            <span class="rank">${rankDisplay}</span>
+            <span class="player-name">${data.playerName}</span>
+            <span class="score">${data.score.toLocaleString()}</span>
+          `;
+          leaderboardElement.appendChild(listItem);
+        });
+        
+        // Add offline indicator
+        const offlineIndicator = document.createElement('li');
+        offlineIndicator.innerHTML = '<small style="opacity:0.6; text-align:center; font-style:italic;">💾 Offline mode - Σκορ αποθηκευμένα τοπικά</small>';
+        leaderboardElement.appendChild(offlineIndicator);
+      }
+      
+      leaderboardElement.classList.remove('hidden');
+    }
+  } catch (error) {
+    console.error('Offline leaderboard error:', error);
+    if (leaderboardElement) {
+      leaderboardElement.innerHTML = '<li class="error">Σφάλμα φόρτωσης offline σκορ</li>';
+      leaderboardElement.classList.remove('hidden');
+    }
+  }
+}
+
+// Enhanced show leaderboard with fallback
+const originalShowLeaderboard = showLeaderboard;
+showLeaderboard = async function(limit = 10) {
+  if (!firebaseReady || !db) {
+    console.log('Using offline leaderboard');
+    showLeaderboardOffline();
+    return;
+  }
+  
+  try {
+    await originalShowLeaderboard(limit);
+  } catch (error) {
+    console.warn('Firebase leaderboard failed, using offline fallback');
+    showLeaderboardOffline();
+  }
+};
 
 // Export functions για χρήση στο game
 window.submitScore = submitScore;
