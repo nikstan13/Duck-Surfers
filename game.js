@@ -582,7 +582,69 @@
   if (restartBtn) restartBtn.addEventListener('click', () => { restartGame(); });
   if (copyBtn) copyBtn.addEventListener('click', async () => {
     const code = offerCodeEl?.textContent || '';
-    try { await navigator.clipboard.writeText(code); if (copyBtn) { copyBtn.textContent = 'Αντιγράφηκε!'; setTimeout(()=> { if (copyBtn) copyBtn.textContent='Αντιγραφή' }, 1200); } } catch {}
+    if (!code) {
+      console.log('No code to copy');
+      return;
+    }
+    
+    try {
+      // Modern clipboard API
+      await navigator.clipboard.writeText(code);
+      if (copyBtn) {
+        copyBtn.textContent = '✓ Αντιγράφηκε!';
+        copyBtn.style.backgroundColor = '#4caf50';
+        setTimeout(() => {
+          if (copyBtn) {
+            copyBtn.textContent = 'Αντιγραφή';
+            copyBtn.style.backgroundColor = '';
+          }
+        }, 1500);
+      }
+      console.log('Code copied:', code);
+    } catch (err) {
+      console.log('Clipboard API failed, trying fallback:', err);
+      // Fallback για παλιότερους browsers ή iOS
+      try {
+        const textArea = document.createElement('textarea');
+        textArea.value = code;
+        textArea.style.position = 'fixed';
+        textArea.style.left = '-999999px';
+        textArea.style.top = '-999999px';
+        document.body.appendChild(textArea);
+        textArea.focus();
+        textArea.select();
+        const successful = document.execCommand('copy');
+        textArea.remove();
+        
+        if (successful && copyBtn) {
+          copyBtn.textContent = '✓ Αντιγράφηκε!';
+          copyBtn.style.backgroundColor = '#4caf50';
+          setTimeout(() => {
+            if (copyBtn) {
+              copyBtn.textContent = 'Αντιγραφή';
+              copyBtn.style.backgroundColor = '';
+            }
+          }, 1500);
+          console.log('Code copied via fallback:', code);
+        } else {
+          throw new Error('execCommand failed');
+        }
+      } catch (fallbackErr) {
+        console.error('All copy methods failed:', fallbackErr);
+        if (copyBtn) {
+          copyBtn.textContent = '✗ Αποτυχία';
+          copyBtn.style.backgroundColor = '#f44336';
+          setTimeout(() => {
+            if (copyBtn) {
+              copyBtn.textContent = 'Αντιγραφή';
+              copyBtn.style.backgroundColor = '';
+            }
+          }, 2000);
+        }
+        // Show the code so user can copy manually
+        alert('Δεν μπόρεσε η αυτόματη αντιγραφή. Ο κωδικός σας:\n\n' + code + '\n\nΑντιγράψτε τον χειροκίνητα.');
+      }
+    }
   });
 
   // Firebase Leaderboard Event Listeners
