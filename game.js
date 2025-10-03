@@ -646,8 +646,18 @@
       if (initialPlayerNameInput) {
         const playerName = initialPlayerNameInput.value.trim();
         if (!playerName) {
-          alert('Παρακαλώ εισάγετε το όνομά σας πρώτα!');
+          // Shake the input field and change placeholder
+          initialPlayerNameInput.classList.add('shake');
+          const originalPlaceholder = initialPlayerNameInput.getAttribute('data-original-placeholder');
+          initialPlayerNameInput.placeholder = '⚠️ Παρακαλώ εισάγετε το όνομά σας!';
           initialPlayerNameInput.focus();
+          
+          // Remove shake class and restore placeholder after animation
+          setTimeout(() => {
+            initialPlayerNameInput.classList.remove('shake');
+            initialPlayerNameInput.placeholder = originalPlaceholder || 'Εισάγετε το όνομά σας';
+          }, 2000); // Longer timeout για να διαβάσει το μήνυμα
+          
           return;
         }
         globalPlayerName = playerName;
