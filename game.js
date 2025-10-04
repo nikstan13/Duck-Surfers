@@ -591,11 +591,12 @@
       // Modern clipboard API
       await navigator.clipboard.writeText(code);
       if (copyBtn) {
-        copyBtn.textContent = '✓ Αντιγράφηκε!';
-        copyBtn.style.backgroundColor = '#4caf50';
+        const originalHTML = copyBtn.innerHTML;
+        copyBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#4caf50" width="20px" height="20px"><path d="M0 0h24v24H0z" fill="none"/><path d="M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z"/></svg>';
+        copyBtn.style.backgroundColor = '#d4edda';
         setTimeout(() => {
           if (copyBtn) {
-            copyBtn.textContent = 'Αντιγραφή';
+            copyBtn.innerHTML = originalHTML;
             copyBtn.style.backgroundColor = '';
           }
         }, 1500);
@@ -649,13 +650,23 @@
 
   // Firebase Leaderboard Event Listeners
   const showLeaderboardBtn = document.getElementById('show-leaderboard-btn');
+  const showLeaderboardMainBtn = document.getElementById('show-leaderboard-main-btn');
   const closeLeaderboardBtn = document.getElementById('close-leaderboard-btn');
   const leaderboardOverlay = document.getElementById('leaderboard-overlay');
 
   if (showLeaderboardBtn && leaderboardOverlay) {
     showLeaderboardBtn.addEventListener('click', async () => {
       leaderboardOverlay.classList.remove('hidden');
-      await window.showLeaderboard(10); // Show top 10
+      const currentPlayer = document.getElementById('initial-player-name')?.value.trim() || null;
+      await window.showLeaderboard(20, currentPlayer); // Show top 20 + current player if outside top 20
+    });
+  }
+
+  if (showLeaderboardMainBtn && leaderboardOverlay) {
+    showLeaderboardMainBtn.addEventListener('click', async () => {
+      leaderboardOverlay.classList.remove('hidden');
+      const currentPlayer = document.getElementById('initial-player-name')?.value.trim() || null;
+      await window.showLeaderboard(20, currentPlayer); // Show top 20 + current player if outside top 20
     });
   }
 
@@ -817,9 +828,10 @@
         .then(success => {
           if (scoreMessageEl) {
             if (success) {
-              scoreMessageEl.innerHTML = '🎉 Νέο υψηλό σκορ καταχωρήθηκε!';
+              scoreMessageEl.innerHTML = 'Συγχαρητήρια! Νέο προσωπικό ρεκόρ!';
             } else {
-              scoreMessageEl.textContent = 'Το σκορ καταχωρήθηκε (δεν είναι νέο ρεκόρ)';
+              // Αν δεν είναι νέο ρεκόρ, κρύβουμε το score-status
+              if (scoreStatusEl) scoreStatusEl.classList.add('hidden');
             }
           }
         })

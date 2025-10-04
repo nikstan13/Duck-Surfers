@@ -124,9 +124,10 @@ async function submitScore(playerName, score) {
 
 /**
  * Εμφανίζει τον πίνακα κατάταξης με podium για top 3
- * @param {number} limit - Αριθμός παικτών προς εμφάνιση (default: 10)
+ * @param {number} limit - Αριθμός παικτών προς εμφάνιση (default: 20)
+ * @param {string} currentPlayerName - Το όνομα του τρέχοντος παίκτη για να δείξουμε τη θέση του
  */
-async function showLeaderboard(limit = 10) {
+async function showLeaderboard(limit = 20, currentPlayerName = null) {
   const leaderboardElement = document.getElementById('leaderboard');
   const podiumElement = document.getElementById('leaderboard-podium');
   const loadingElement = document.getElementById('leaderboard-loading');
@@ -163,6 +164,31 @@ async function showLeaderboard(limit = 10) {
         players.push(doc.data());
       });
       
+      // Έλεγχος αν ο τρέχων παίκτης είναι εκτός top 20
+      let currentPlayerRank = null;
+      let currentPlayerData = null;
+      
+      if (currentPlayerName) {
+        const playerIndex = players.findIndex(p => p.playerName === currentPlayerName);
+        if (playerIndex !== -1) {
+          currentPlayerRank = playerIndex + 1;
+        } else {
+          // Ο παίκτης δεν είναι στο top 20, βρες τη θέση του
+          const allPlayersSnapshot = await db.collection('leaderboard')
+            .orderBy('score', 'desc')
+            .get();
+          
+          let rank = 1;
+          allPlayersSnapshot.forEach((doc) => {
+            if (doc.data().playerName === currentPlayerName) {
+              currentPlayerRank = rank;
+              currentPlayerData = doc.data();
+            }
+            rank++;
+          });
+        }
+      }
+      
       // Top 3 στο podium
       if (podiumElement && players.length > 0) {
         podiumElement.innerHTML = '';
@@ -184,8 +210,7 @@ async function showLeaderboard(limit = 10) {
             podiumPlace.innerHTML = `
               <div class="podium-medal">${pos.medal}</div>
               <div class="podium-player">${player.playerName}</div>
-              <div class="podium-score">${player.score.toLocaleString()}</div>
-              <div class="podium-rank">#${pos.place}</div>
+              <div class="podium-score">${player.score.toLocaleString()} pts</div>
             `;
             podiumContainer.appendChild(podiumPlace);
           }
@@ -203,11 +228,34 @@ async function showLeaderboard(limit = 10) {
           const data = players[i];
           const listItem = document.createElement('li');
           listItem.className = 'leaderboard-item';
+          listItem.setAttribute('data-rank', i + 1);
           
           listItem.innerHTML = `
             <span class="rank">#${i + 1}</span>
             <span class="player-name">${data.playerName}</span>
-            <span class="score">${data.score.toLocaleString()}</span>
+            <span class="score">${data.score.toLocaleString()} pts</span>
+          `;
+          
+          leaderboardElement.appendChild(listItem);
+        }
+        
+        // Προσθήκη του τρέχοντος παίκτη αν είναι κάτω από top 20
+        if (currentPlayerRank && currentPlayerRank > limit && currentPlayerData) {
+          // Προσθήκη separator
+          const separator = document.createElement('li');
+          separator.className = 'leaderboard-separator';
+          separator.innerHTML = '<span>...</span>';
+          leaderboardElement.appendChild(separator);
+          
+          // Προσθήκη του τρέχοντος παίκτη
+          const listItem = document.createElement('li');
+          listItem.className = 'leaderboard-item current-player';
+          listItem.setAttribute('data-rank', currentPlayerRank);
+          
+          listItem.innerHTML = `
+            <span class="rank">#${currentPlayerRank}</span>
+            <span class="player-name">${currentPlayerData.playerName}</span>
+            <span class="score">${currentPlayerData.score.toLocaleString()} pts</span>
           `;
           
           leaderboardElement.appendChild(listItem);
