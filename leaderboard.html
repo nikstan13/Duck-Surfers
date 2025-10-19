@@ -68,14 +68,8 @@
         font-size: 36px;
         font-weight: 800;
         color: #135a8b;
-        margin: 0 0 10px 0;
+        margin: 0 0 30px 0;
         text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
-      }
-      
-      .leaderboard-header p {
-        font-size: 16px;
-        color: #666;
-        margin: 0;
       }
       
       .floating-ducks {
@@ -121,65 +115,7 @@
           transform: translate(20px, 10px) rotate(270deg);
         }
       }
-      
-      .button-row {
-        display: flex;
-        gap: 15px;
-        justify-content: center;
-        margin-top: 30px;
-        flex-wrap: wrap;
-      }
-      
-      .btn-3d {
-        padding: 14px 28px;
-        font-size: 16px;
-        font-weight: 700;
-        border: none;
-        border-radius: 12px;
-        cursor: pointer;
-        transition: all 0.2s ease;
-        text-decoration: none;
-        display: inline-block;
-        text-align: center;
-        color: #000;
-      }
-      
-      .btn-primary {
-        background: linear-gradient(135deg, #e9b50b 0%, #d4a00a 100%);
-        box-shadow: 6px 6px 0 #000;
-      }
-      
-      .btn-primary:hover {
-        box-shadow: 8px 8px 0 #000;
-        transform: translate(-2px, -2px);
-      }
-      
-      .btn-primary:active {
-        box-shadow: 4px 4px 0 #000;
-        transform: translate(2px, 2px);
-      }
-      
-      .btn-secondary {
-        background: linear-gradient(135deg, #fff 0%, #f0f0f0 100%);
-        box-shadow: 6px 6px 0 #000;
-      }
-      
-      .btn-secondary:hover {
-        box-shadow: 8px 8px 0 #000;
-        transform: translate(-2px, -2px);
-      }
-      
-      .btn-secondary:active {
-        box-shadow: 4px 4px 0 #000;
-        transform: translate(2px, 2px);
-      }
-      
-      .auto-refresh {
-        text-align: center;
-        margin-top: 20px;
-        font-size: 14px;
-        color: #999;
-      }
+
       
       .loading-indicator {
         text-align: center;
@@ -243,8 +179,7 @@
         </div>
         
         <div class="leaderboard-header">
-          <h1>🦆 Κατάταξη Duck Surfers</h1>
-          <p>Οι κορυφαίοι παίκτες</p>
+          <h1>Κατάταξη Duck Surfers</h1>
         </div>
         
         <div id="leaderboard-loading" class="loading-indicator">
@@ -257,15 +192,6 @@
         
         <!-- Λίστα για τους υπόλοιπους -->
         <ul id="leaderboard" class="hidden"></ul>
-        
-        <div class="button-row">
-          <a href="index.html" class="btn-3d btn-primary">🎮 Παίξε Τώρα</a>
-          <button id="refresh-btn" class="btn-3d btn-secondary">🔄 Ανανέωση</button>
-        </div>
-        
-        <div class="auto-refresh">
-          Αυτόματη ανανέωση κάθε 30 δευτερόλεπτα
-        </div>
       </div>
     </div>
 
@@ -289,16 +215,6 @@
           }
         }, 30000);
       });
-      
-      // Manual refresh button
-      const refreshBtn = document.getElementById('refresh-btn');
-      if (refreshBtn) {
-        refreshBtn.addEventListener('click', async () => {
-          if (window.showLeaderboard) {
-            await window.showLeaderboard(20);
-          }
-        });
-      }
     </script>
   </body>
 </html>
