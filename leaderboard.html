@@ -129,9 +129,40 @@
       
       /* Responsive */
       @media (max-width: 768px) {
-        .leaderboard-card {
-          padding: 30px 20px;
+        body {
+          align-items: flex-start;
+          padding-top: 20px;
         }
+        
+        #leaderboard-container {
+          max-width: 100%;
+          padding: 10px;
+        }
+        
+        .leaderboard-card {
+          padding: 20px 15px;
+          transform: rotateX(1deg) rotateY(-1deg);
+        }
+        
+        .leaderboard-card::before {
+          bottom: -8px;
+          right: -8px;
+        }
+        
+        .floating-duck {
+          opacity: 0.3;
+        }
+        
+        .floating-duck:nth-child(1) { width: 35px; }
+        .floating-duck:nth-child(2) { width: 32px; }
+        .floating-duck:nth-child(3) { width: 38px; }
+        .floating-duck:nth-child(4) { width: 34px; }
+        .floating-duck:nth-child(5) { width: 36px; }
+        .floating-duck:nth-child(6) { width: 33px; }
+        .floating-duck:nth-child(7) { width: 37px; }
+        .floating-duck:nth-child(8) { width: 35px; }
+        .floating-duck:nth-child(9) { width: 36px; }
+        .floating-duck:nth-child(10) { width: 34px; }
       }
     </style>
   </head>
