@@ -27,6 +27,7 @@
         justify-content: center;
         font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
         padding: 20px;
+        overflow: auto;
       }
       
       #leaderboard-container {
@@ -40,11 +41,18 @@
       .outer-box {
         max-width: 560px;
         margin: 0 auto;
+        min-height: auto !important;
       }
       
-      /* Remove yellow glow shadow */
-      .shadow__outer {
+      /* Remove yellow glow shadow - multiple methods */
+      .shadow__outer,
+      .outer-box .shadow__outer,
+      .card .shadow__outer {
         display: none !important;
+        opacity: 0 !important;
+        visibility: hidden !important;
+        background: none !important;
+        filter: none !important;
       }
       
       .floating-ducks {
