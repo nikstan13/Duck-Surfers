@@ -26,35 +26,26 @@
         align-items: center;
         justify-content: center;
         font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+        padding: 20px;
       }
       
       #leaderboard-container {
         width: 100%;
         max-width: 600px;
-        padding: 20px;
-        box-sizing: border-box;
+        margin: 0 auto;
       }
       
       .leaderboard-card {
         position: relative;
         background: transparent;
-        border-radius: 20px;
-        padding: 40px 30px;
+        padding: 0;
         box-shadow: none;
-        transform: rotateX(2deg) rotateY(-2deg);
+        transform: none;
         transform-style: preserve-3d;
       }
       
       .leaderboard-card::before {
-        content: '';
-        position: absolute;
-        bottom: -12px;
-        right: -12px;
-        width: 100%;
-        height: 100%;
-        background: #000;
-        border-radius: 20px;
-        z-index: -1;
+        display: none;
       }
       
       .floating-ducks {
@@ -131,22 +122,15 @@
       @media (max-width: 768px) {
         body {
           align-items: flex-start;
-          padding-top: 20px;
+          padding: 15px 10px;
         }
         
         #leaderboard-container {
           max-width: 100%;
-          padding: 10px;
         }
         
         .leaderboard-card {
-          padding: 20px 15px;
-          transform: rotateX(1deg) rotateY(-1deg);
-        }
-        
-        .leaderboard-card::before {
-          bottom: -8px;
-          right: -8px;
+          padding: 0;
         }
         
         .floating-duck {
