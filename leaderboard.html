@@ -35,32 +35,6 @@
         margin: 0 auto;
       }
       
-      .leaderboard-card {
-        position: relative;
-        background: transparent;
-        padding: 0;
-        box-shadow: none;
-        transform: none;
-        transform-style: preserve-3d;
-      }
-      
-      .leaderboard-card::before {
-        display: none;
-      }
-      
-      /* Override styles.css .shadow__outer for leaderboard page */
-      .shadow__outer {
-        display: none !important;
-      }
-      
-      /* Remove any outer-box styling */
-      .outer-box {
-        background: transparent !important;
-        border: none !important;
-        box-shadow: none !important;
-        padding: 0 !important;
-      }
-      
       .floating-ducks {
         position: absolute;
         top: 0;
@@ -142,10 +116,6 @@
           max-width: 100%;
         }
         
-        .leaderboard-card {
-          padding: 0;
-        }
-        
         .floating-duck {
           opacity: 0.3;
         }
@@ -165,7 +135,7 @@
   </head>
   <body>
     <div id="leaderboard-container">
-      <div class="leaderboard-card">
+      <div class="card outer-box">
         <div class="floating-ducks">
           <img src="Assets/duck.png" class="floating-duck" alt="">
           <img src="Assets/duck.png" class="floating-duck" alt="">
@@ -178,6 +148,7 @@
           <img src="Assets/duck.png" class="floating-duck" alt="">
           <img src="Assets/duck.png" class="floating-duck" alt="">
         </div>
+        <div class="shadow__outer"></div>
         
         <div id="leaderboard-loading" class="loading-indicator">
           <div class="spinner"></div>
