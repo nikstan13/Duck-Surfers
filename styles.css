@@ -1387,55 +1387,80 @@ button.primary { background: #ffd166; box-shadow: 0 2px 0 #e6b34d; color: #0b223
 /* Mobile responsive adjustments */
 @media (max-width: 767px) {
   .podium-container {
-    gap: 10px;
+    gap: 8px;
+    padding: 15px 0;
+    max-width: 100%;
   }
   
   .podium-place {
-    min-width: 80px;
-    max-width: 120px;
-    padding: 15px 10px;
+    min-width: 70px;
+    max-width: 95px;
+    padding: 12px 8px;
+    font-size: 12px;
   }
   
   .podium-place.tall {
-    min-height: 120px;
+    min-height: 110px;
   }
   
   .podium-place.medium {
-    min-height: 100px;
+    min-height: 90px;
   }
   
   .podium-place.short {
-    min-height: 80px;
+    min-height: 75px;
   }
   
   .podium-place.tall::before,
   .podium-place.medium::before,
   .podium-place.short::before {
-    width: 35px;
-    height: 35px;
-    font-size: 18px;
-    top: -18px;
+    width: 32px;
+    height: 32px;
+    font-size: 16px;
+    top: -16px;
   }
   
   .podium-player {
-    font-size: 12px;
+    font-size: 11px;
+    line-height: 1.2;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
   
   .podium-score {
-    font-size: 11px;
+    font-size: 10px;
+    margin-top: 2px;
   }
   
   .leaderboard-item {
-    padding: 10px 15px 10px 40px;
-    margin-bottom: 10px;
+    padding: 8px 12px 8px 38px;
+    margin: 0 0 10px 15px;
     box-shadow: 4px 4px 0 #000;
+    font-size: 14px;
   }
   
   .leaderboard-item::before {
-    left: -12px;
-    width: 22px;
-    height: 22px;
+    left: -10px;
+    width: 24px;
+    height: 24px;
+    font-size: 11px;
+    padding: 4px 6px;
+  }
+  
+  .leaderboard-item .player-name {
+    font-size: 14px;
+    margin: 0 8px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  
+  .leaderboard-item .score {
     font-size: 12px;
+    white-space: nowrap;
+    min-width: 65px;
+    text-align: right;
   }
   
   .leaderboard-item:hover {
