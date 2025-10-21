@@ -1,6 +1,40 @@
 (() => {
   'use strict';
 
+  // Discount codes array - mapped to percent values 1-30
+  const DISCOUNT_CODES = [
+    'flowerA1QZ',    // 1%
+    'flowerK2M',     // 2%
+    'flowerB3TX',    // 3%
+    'flower4ZPL',    // 4%
+    'flowerR5JY',    // 5%
+    'flower6QDA',    // 6%
+    'flowerT7LX',    // 7%
+    'flower8WRC',    // 8%
+    'flowerE9MF',    // 9%
+    'flower10NY',    // 10%
+    'flowerH11QB',   // 11%
+    'flower12VTR',   // 12%
+    'flowerM13CZ',   // 13%
+    'flower14JGP',   // 14%
+    'flower15SXL',   // 15%
+    'flowerP16KW',   // 16%
+    'flower17BZQ',   // 17%
+    'flowerF18TM',   // 18%
+    'flower19LDY',   // 19%
+    'flower20HRC',   // 20%
+    'flowerA21WF',   // 21%
+    'flower22NXP',   // 22%
+    'flowerK23ZQ',   // 23%
+    'flower24RTJ',   // 24%
+    'flower25CBM',   // 25%
+    'flower26GYN',   // 26%
+    'flower27JQH',   // 27%
+    'flower28VDS',   // 28%
+    'flower29WKL',   // 29%
+    'flower30TPR'    // 30%
+  ];
+
   // Config (can be tweaked via query params)
   const params = new URLSearchParams(location.search);
   const CONFIG = {
@@ -799,7 +833,8 @@
     if (finalScoreEl) finalScoreEl.textContent = String(Math.floor(state.score));
     const percent = Math.min(CONFIG.maxPercent, Math.max(0, state.offersCollected));
     if (percent > 0) {
-      const code = `${CONFIG.codeBase}${percent}`;
+      // Use predefined discount code based on percent (1-30)
+      const code = DISCOUNT_CODES[percent - 1] || `${CONFIG.codeBase}${percent}`;
       state.offerCode = code;
       if (offerCodeEl) offerCodeEl.textContent = code;
       if (offerDescEl) offerDescEl.textContent = `Κέρδισες ${percent}% για το ${CONFIG.drop} (${CONFIG.brand})`;
